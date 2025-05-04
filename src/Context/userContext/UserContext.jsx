@@ -4,10 +4,35 @@ import { useEffect, useState } from "react";
 
 export const UserProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const userId = localStorage.getItem("user_id");
     setIsAuthenticated(!!userId);
+    
+    // Fetch user data if there's a userId in localStorage
+    if (userId) {
+      const fetchUser = async () => {
+        try {
+          const response = await axios.get('/api/auth/me', {
+            withCredentials: true
+          });
+          setUser(response.data);
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          // If authentication fails, clear storage
+          if (error.response && error.response.status === 401) {
+            localStorage.removeItem("role_name");
+            localStorage.removeItem("user_id");
+            localStorage.removeItem("university_id");
+            localStorage.removeItem("society_id");
+            setIsAuthenticated(false);
+          }
+        }
+      };
+      
+      fetchUser();
+    }
   }, []);
 
   const login = async (cred) => {
@@ -33,6 +58,17 @@ export const UserProvider = ({ children }) => {
         localStorage.setItem("society_id", response.data.society_id);
 
       setIsAuthenticated(true);
+      
+      // Fetch user data after successful login
+      try {
+        const userResponse = await axios.get('/api/auth/me', {
+          withCredentials: true
+        });
+        setUser(userResponse.data);
+      } catch (error) {
+        console.error('Error fetching user data after login:', error);
+      }
+      
       return response.status;
     } catch (error) {
       return error.response ? error.response.status : 500;
@@ -94,6 +130,7 @@ export const UserProvider = ({ children }) => {
       );
 
       setIsAuthenticated(false);
+      setUser(null);
       localStorage.removeItem("role_name");
       localStorage.removeItem("user_id");
       localStorage.removeItem("university_id");
@@ -112,6 +149,7 @@ export const UserProvider = ({ children }) => {
         signup,
         logOut,
         isAuthenticated,
+        user
       }}
     >
       {children}

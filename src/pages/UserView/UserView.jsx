@@ -8,6 +8,7 @@ import SocietyPage from './SocietyPage'
 import ViewAllEvents from './ViewAllEvents'
 import EventPage from './EventPage'
 import ContactUs from './ContactUs'
+import Chat from './Chat'
 
 const UserView = () => {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
@@ -22,6 +23,7 @@ const UserView = () => {
             <Route path="/viewevent/:id" element={<EventPage />} />
             <Route path="/viewsociety/:id" element={<SocietyPage />} />
             <Route path="/contactus" element={<ContactUs />} />
+            <Route path="/chat" element={<Chat />} />
         </Routes>
         <AboutUs/>
     

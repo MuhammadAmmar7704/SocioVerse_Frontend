@@ -182,6 +182,9 @@ const Navbar = (props) => {
           <li className="hover:bg-teal-600 link-">
             <Link to="contactus">CONTACT US</Link>
           </li>
+          <li className="hover:bg-teal-600 link-">
+            <Link to="chat">CHAT</Link>
+          </li>
         </ul>
       </div>
     </div>
