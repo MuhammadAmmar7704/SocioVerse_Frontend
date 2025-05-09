@@ -1,23 +1,25 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import CardContainer from "./CardContainer";
 import EventContext from "../../Context/eventContext/createContext.js";
 import { Box } from "@mui/material";
 
 const ViewAllEvents = () => {
   const { events, loading, error } = useContext(EventContext);
-
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
   const upcomingEvents = events.filter(
-    (event) => new Date(event.event_date) >= today
+    (event) => new Date(event.date) >= today
   );
   const pastEvents = events.filter(
-    (event) => new Date(event.event_date) < today
+    (event) => new Date(event.date) < today
   );
+
 
   return (
     <Box
       className="px-6 py-8"
-      Box
+      // box
       sx={{
         background: "#E8E8E8",
         minHeight: "100vh",

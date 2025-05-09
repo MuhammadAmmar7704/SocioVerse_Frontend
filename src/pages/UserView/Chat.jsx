@@ -14,37 +14,33 @@ const Chat = () => {
   const [error, setError] = useState(null);
   const messageContainerRef = useRef(null);
 
-  console.log('Current user:', user); // Debug log
+  console.log('Current user:', user);
 
-  // Initialize socket connection
   useEffect(() => {
     const newSocket = io('http://localhost:5000');
     setSocket(newSocket);
 
-    // Cleanup on unmount
     return () => {
       if (newSocket) newSocket.disconnect();
     };
   }, []);
 
-  // Handle socket events
+  
   useEffect(() => {
     if (!socket || !user) return;
 
     const userId = user?.userID || user?.user_id;
-    console.log('Connecting user to socket:', userId, user.username); // Debug log
+    console.log('Connecting user to socket:', userId, user.username);
 
-    // Connect user
+    
     socket.emit('user_connected', {
       userId: userId,
       name: user.username
     });
 
-    // Get online users
     socket.on('users_list', (usersList) => {
-      console.log('Received users list:', usersList); // Debug log
+      console.log('Received users list:', usersList);
       setUsers((prevUsers) => {
-        // Keep existing user data and update with online status
         const updatedUsers = prevUsers.map(user => {
           const onlineUser = usersList.find(u => u.userId === user.user_id);
           return {
@@ -56,7 +52,7 @@ const Chat = () => {
       });
     });
 
-    // Handle incoming messages
+    
     socket.on('new_message', (data) => {
       if (selectedUser && data.fromUserId === selectedUser.user_id) {
         setMessages(prevMessages => [...prevMessages, {
@@ -70,9 +66,9 @@ const Chat = () => {
       }
     });
 
-    // Handle message history
+    
     socket.on('message_history', (data) => {
-      console.log('Received message history:', data); // Debug log
+      console.log('Received message history:', data); 
       const formattedMessages = data.messages.map(msg => ({
         ...msg,
         isOwn: msg.from_user_id === userId
@@ -88,7 +84,7 @@ const Chat = () => {
     };
   }, [socket, user, selectedUser]);
 
-  // Fetch all users
+  
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -109,7 +105,7 @@ const Chat = () => {
         setLoading(false);
       } catch (error) {
         console.error('Error fetching users:', error);
-        // Show more detailed error information
+        
         const errorMsg = error.response 
           ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText}` 
           : 'Network error connecting to server';
@@ -123,7 +119,7 @@ const Chat = () => {
     }
   }, [user]);
 
-  // Auto-scroll to bottom when messages change
+  
   useEffect(() => {
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
@@ -137,7 +133,7 @@ const Chat = () => {
     
     if (socket && user) {
       const userId = user?.userID || user?.user_id;
-      console.log('Getting message history with:', selectedUser.user_id); // Debug log
+      console.log('Getting message history with:', selectedUser.user_id);
       socket.emit('get_message_history', {
         userId: userId,
         otherUserId: selectedUser.user_id
@@ -156,10 +152,10 @@ const Chat = () => {
       toUserId: selectedUser.user_id
     };
 
-    console.log('Sending message:', messageData); // Debug log
+    console.log('Sending message:', messageData); 
     socket.emit('private_message', messageData);
 
-    // Optimistically add message to the UI
+    
     setMessages(prevMessages => [...prevMessages, {
       id: 'temp-' + Date.now(),
       content: message,
@@ -172,7 +168,7 @@ const Chat = () => {
     setMessage('');
   };
 
-  // Format timestamp
+  
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
